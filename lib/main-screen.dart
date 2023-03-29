@@ -3,6 +3,7 @@ import 'package:flutter/src/widgets/framework.dart';
 import 'package:flutter/src/widgets/placeholder.dart';
 import 'package:qrcodenew/qr-create.dart';
 import 'package:qrcodenew/qr-scan.dart';
+import 'package:qrcodenew/qr-scanner2.dart';
 
 class MainScreen extends StatefulWidget {
   const MainScreen({super.key});
@@ -30,7 +31,14 @@ class _MainScreenState extends State<MainScreen> {
                 return ScanQR();
               }));
             },
-            child: Text("Scan QR"))
+            child: Text("Scan QR")),
+        ElevatedButton(
+            onPressed: () {
+              Navigator.push(context, MaterialPageRoute(builder: (context) {
+                return QRScanner2Screen();
+              }));
+            },
+            child: Text("qr scanner 2"))
       ]),
     );
   }
