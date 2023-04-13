@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/src/widgets/framework.dart';
 import 'package:flutter/src/widgets/placeholder.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
+import 'package:qrcodenew/qr-create.dart';
 import 'package:qrcodenew/qr-scanner2-result.dart';
 
 class QRScanner2Screen extends StatefulWidget {
@@ -12,6 +13,8 @@ class QRScanner2Screen extends StatefulWidget {
 
 class _QRScanner2ScreenState extends State<QRScanner2Screen> {
   bool isScanCompleted = false;
+  MobileScannerController cameraController = MobileScannerController();
+
   void closeScreen() {
     isScanCompleted = false;
   }
@@ -19,11 +22,47 @@ class _QRScanner2ScreenState extends State<QRScanner2Screen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(),
+      appBar: AppBar(
+        title: const Text("Mobile Scanner"),
+        actions: [
+          IconButton(
+            color: Colors.white,
+            icon: ValueListenableBuilder(
+              valueListenable: cameraController.torchState,
+              builder: (context, state, child) {
+                switch (state as TorchState) {
+                  case TorchState.off:
+                    return const Icon(Icons.flash_off, color: Colors.grey);
+                  case TorchState.on:
+                    return const Icon(Icons.flash_on, color: Colors.yellow);
+                }
+              },
+            ),
+            iconSize: 32.0,
+            onPressed: () => cameraController.toggleTorch(),
+          ),
+          IconButton(
+            color: Colors.white,
+            icon: ValueListenableBuilder(
+              valueListenable: cameraController.cameraFacingState,
+              builder: (context, state, child) {
+                switch (state as CameraFacing) {
+                  case CameraFacing.front:
+                    return const Icon(Icons.camera_front);
+                  case CameraFacing.back:
+                    return const Icon(Icons.camera_rear);
+                }
+              },
+            ),
+            iconSize: 32.0,
+            onPressed: () => cameraController.switchCamera(),
+          ),
+        ],
+      ),
       body: Column(children: [
         Expanded(
-          child: Container(
-            color: Colors.red,
+          child: Center(
+            child: Text("Place the QR code in the area"),
           ),
         ),
         Expanded(
@@ -32,11 +71,12 @@ class _QRScanner2ScreenState extends State<QRScanner2Screen> {
             padding:
                 const EdgeInsets.only(left: 30, right: 30, bottom: 50, top: 50),
             child: MobileScanner(
+              controller: cameraController,
               onDetect: (barcode) {
+                Navigator.pop(context);
                 String code = barcode.toString();
                 final List<Barcode> barcodes = barcode.barcodes;
                 for (final the_barcode in barcodes) {
-                  debugPrint('Barcode found! ${the_barcode.rawValue}');
                   Navigator.push(context, MaterialPageRoute(
                     builder: (context) {
                       return ScannerResultScreen(
@@ -54,8 +94,10 @@ class _QRScanner2ScreenState extends State<QRScanner2Screen> {
           ),
         ),
         Expanded(
-          child: Container(
-            color: Colors.green,
+          child: Center(
+            child: Text(
+              "Scanning will start automatically",
+            ),
           ),
         ),
       ]),
